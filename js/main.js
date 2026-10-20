@@ -42,6 +42,7 @@
       chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
 
       let count = 0;
+      let shown = 0;
       products.forEach((p) => {
         const cats = p.dataset.cat.split(' ');
         const show = filter === 'all' || cats.includes(filter) || cats.includes('all');
@@ -50,9 +51,11 @@
         p.classList.add('is-in'); // nunca esconder pelo reveal depois de filtrar
         p.classList.remove('is-filtered-in');
         if (show && wasHidden) {
+          p.style.setProperty('--fd', `${Math.min(shown, 8) * 35}ms`);
           void p.offsetWidth; // reinicia a animação
           p.classList.add('is-filtered-in');
         }
+        if (show) shown++;
         if (show && !cats.includes('all')) count++;
       });
       filterStatus.textContent = filter === 'all'
@@ -61,13 +64,10 @@
     });
   });
 
-  /* ---------- Entrada ao rolar ---------- */
-  const reveals = document.querySelectorAll('.reveal');
+  /* ---------- Entrada ao rolar (grades de cards) ----------
+     Os cards são visíveis por padrão; só os que ainda estão abaixo da dobra
+     são "armados" para entrar ao rolar. Sem JS ou com movimento reduzido, nada some. */
   if ('IntersectionObserver' in window && !reduceMotion.matches) {
-    // escalonamento leve dentro de cada grade
-    document.querySelectorAll('.product-grid, .fc-list, .review-list').forEach((list) => {
-      [...list.children].forEach((el, i) => el.style.setProperty('--d', `${(i % 4) * 70}ms`));
-    });
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -76,9 +76,15 @@
         }
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-    reveals.forEach((el) => io.observe(el));
-  } else {
-    reveals.forEach((el) => el.classList.add('is-in'));
+
+    document.querySelectorAll('.product-grid, .fc-list, .review-list').forEach((list) => {
+      [...list.children].forEach((el, i) => {
+        if (el.getBoundingClientRect().top < window.innerHeight) return;
+        el.style.setProperty('--d', `${(i % 4) * 70}ms`); // escalonamento leve por linha
+        el.classList.add('reveal-armed');
+        io.observe(el);
+      });
+    });
   }
 
   /* ---------- Almofada interativa (hero) ---------- */
@@ -460,9 +466,13 @@
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   }
 
+  let activePointer = null;
+
   canvas.addEventListener('pointerdown', (e) => {
+    if (pressed && e.pointerId !== activePointer) return; // ignora um segundo dedo
     stopAnim();
     pressed = true;
+    activePointer = e.pointerId;
     canvas.setPointerCapture(e.pointerId);
     roller = pointerPos(e);
     lastPos = roller;
@@ -472,6 +482,7 @@
 
   canvas.addEventListener('pointermove', (e) => {
     if (anim) return;
+    if (pressed && e.pointerId !== activePointer) return;
     const p = pointerPos(e);
     // com mouse, passar por cima já limpa; no toque, só arrastando
     if (pressed || e.pointerType === 'mouse') {
@@ -482,9 +493,10 @@
     requestRender();
   });
 
-  const release = () => { pressed = false; lastPos = null; };
+  const release = () => { pressed = false; lastPos = null; activePointer = null; };
   canvas.addEventListener('pointerup', release);
   canvas.addEventListener('pointercancel', release);
+  canvas.addEventListener('lostpointercapture', release);
   canvas.addEventListener('pointerleave', () => {
     if (anim) return;
     release();
@@ -524,7 +536,7 @@
 
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
-      const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       let d = eased * totalLen;
       let i = 0;
       while (i < lens.length - 1 && d > lens[i]) { d -= lens[i]; i++; }
