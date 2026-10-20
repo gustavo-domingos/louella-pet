@@ -330,7 +330,8 @@ a { color: inherit; }
   font-family: var(--font-display);
   font-stretch: 80%;
   font-weight: 800;
-  font-size: 1.5rem;
+  font-size: clamp(1.125rem, 4vw, 1.5rem);
+  white-space: nowrap;
   transform: translate(-50%, -50%);
   animation: pop .4s var(--ease-out);
   pointer-events: none;

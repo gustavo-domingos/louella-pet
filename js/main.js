@@ -93,8 +93,8 @@
   const doneBadge = document.getElementById('sofa-done');
   const status = document.getElementById('sofa-status');
 
-  // cores de pelo: branco, creme, caramelo, marrom, cinza e preto
-  const HAIR_COLORS = ['#FFFFFF', '#FFFFFF', '#F4E9D4', '#E3C79E', '#B98757', '#7B5A3C', '#C9CDD2', '#1C2733'];
+  // cores de pelo: do gato branco e do cachorro caramelo que dormem no sofá
+  const HAIR_COLORS = ['#FFFFFF', '#FFFFFF', '#F4E9D4', '#E3B37A', '#E3B37A', '#C98F52', '#A8733F'];
   // área das almofadas (proporções do canvas)
   const AREA = { x0: 0.05, x1: 0.95, y0: 0.27, y1: 0.93 };
 
@@ -111,7 +111,8 @@
 
   function seedHairs() {
     hairs = [];
-    const n = 380;
+    // densidade constante: menos pelos em telas pequenas
+    const n = Math.round(Math.min(380, Math.max(160, (W * H) / 560)));
     for (let i = 0; i < n; i++) {
       hairs.push({
         x: AREA.x0 + Math.random() * (AREA.x1 - AREA.x0),
@@ -249,13 +250,167 @@
     ctx.restore();
   }
 
+  /* ---- Cachorro e gato no encosto (traço da logo) ---- */
+  const INK = '#0E2238';
+  const P = (d) => new Path2D(d);
+  // desenhos em unidades locais: gato 120x80, cachorro 150x80, apoiados em y = 72
+  const CAT = {
+    w: 120,
+    tail: P('M98 70 C116 70 120 52 110 44'),
+    body: P('M24 72 C22 46 44 30 72 30 C98 30 112 48 110 72 Z'),
+    ears: P('M19 42 L17 22 L31 31 Z M38 30 L51 21 L51 40 Z'),
+    innerEars: P('M21 36 L20 27 L27 32 Z M41 30 L48 26 L48 35 Z'),
+    head: P('M53 48 A19 19 0 1 1 15 48 A19 19 0 1 1 53 48 Z'),
+    sleep: P('M25 48 Q29 52 33 48 M37 48 Q41 52 45 48'),
+    eyes: [[29, 47], [41, 47]],
+    nose: P('M32.5 54 L37.5 54 L35 57 Z'),
+    mouth: P('M35 57 Q33 60 30.5 58.5 M35 57 Q37 60 39.5 58.5'),
+    paws: [[30, 72], [46, 72]],
+    heart: [34, 18],
+  };
+  const DOG = {
+    w: 150,
+    tail: P('M136 66 C150 58 150 44 144 38'),
+    body: P('M36 72 C36 44 66 34 98 36 C126 38 140 52 140 72 Z'),
+    spot: P('M92 44 C102 38 118 40 120 50 C114 56 98 56 92 44 Z'),
+    head: P('M64 50 A24 21 0 1 1 16 50 A24 21 0 1 1 64 50 Z'),
+    snout: P('M35 59 A13 9.5 0 1 1 9 59 A13 9.5 0 1 1 35 59 Z'),
+    nose: P('M16.5 55 A4.5 3.5 0 1 1 7.5 55 A4.5 3.5 0 1 1 16.5 55 Z'),
+    ear: P('M48 31 C64 29 69 52 60 65 C51 62 43 47 48 31 Z'),
+    sleep: P('M29 45 Q33 49 37 45'),
+    eyes: [[33, 45]],
+    paws: [[18, 72], [38, 72]],
+    heart: [40, 18],
+  };
+  const HEART = P('M0 3 C0 -1.5 -6.5 -1.5 -6.5 3.5 C-6.5 7 -2 9.5 0 12 C2 9.5 6.5 7 6.5 3.5 C6.5 -1.5 0 -1.5 0 3 Z');
+  let wokeAt = 0;
+
+  function petScale() {
+    return (H * 0.21) / 80;
+  }
+
+  function fillStroke(path, fill, lw) {
+    ctx.fillStyle = fill;
+    ctx.fill(path);
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = INK;
+    ctx.stroke(path);
+  }
+
+  function paw(x, y, fill, lw) {
+    ctx.beginPath();
+    ctx.ellipse(x, y, 8, 4.2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = INK;
+    ctx.stroke();
+  }
+
+  function thickTail(path, color, lw, width) {
+    ctx.lineWidth = width + lw * 2;
+    ctx.strokeStyle = INK;
+    ctx.stroke(path);
+    ctx.lineWidth = width;
+    ctx.strokeStyle = color;
+    ctx.stroke(path);
+  }
+
+  function face(pet, awake, lw) {
+    if (awake) {
+      ctx.fillStyle = INK;
+      pet.eyes.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 2.8, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    } else {
+      ctx.lineWidth = lw;
+      ctx.strokeStyle = INK;
+      ctx.stroke(pet.sleep);
+    }
+  }
+
+  function heart(pet, k) {
+    if (k <= 0) return;
+    const [hx, hy] = pet.heart;
+    ctx.save();
+    ctx.translate(hx, hy - 6 * k);
+    ctx.scale(k * 1.3, k * 1.3);
+    ctx.fillStyle = '#E2403F';
+    ctx.fill(HEART);
+    ctx.lineWidth = 1.4;
+    ctx.strokeStyle = INK;
+    ctx.stroke(HEART);
+    ctx.restore();
+  }
+
+  function drawPets(awake, k) {
+    const s = petScale();
+    const lw = 2 / s; // contorno de 2px na tela, qualquer que seja a escala
+    const baseY = H * 0.255 - 72 * s;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // cachorro à esquerda, virado para o centro
+    ctx.save();
+    ctx.translate(W * 0.05 + DOG.w * s, baseY);
+    ctx.scale(-s, s);
+    thickTail(DOG.tail, '#E3B37A', lw, 8);
+    fillStroke(DOG.body, '#E3B37A', lw);
+    ctx.fillStyle = '#C98F52';
+    ctx.fill(DOG.spot);
+    fillStroke(DOG.head, '#E3B37A', lw);
+    fillStroke(DOG.snout, '#F6E3C6', lw);
+    fillStroke(DOG.ear, '#A8733F', lw);
+    ctx.fillStyle = INK;
+    ctx.fill(DOG.nose);
+    face(DOG, awake, lw);
+    DOG.paws.forEach(([x, y]) => paw(x, y, '#F6E3C6', lw));
+    heart(DOG, k);
+    ctx.restore();
+
+    // gato à direita
+    ctx.save();
+    ctx.translate(W * 0.95 - CAT.w * s, baseY);
+    ctx.scale(s, s);
+    thickTail(CAT.tail, '#FFFFFF', lw, 7);
+    fillStroke(CAT.body, '#FFFFFF', lw);
+    fillStroke(CAT.ears, '#FFFFFF', lw);
+    ctx.fillStyle = '#F6B8BE';
+    ctx.fill(CAT.innerEars);
+    fillStroke(CAT.head, '#FFFFFF', lw);
+    face(CAT, awake, lw);
+    ctx.fillStyle = '#F29CA3';
+    ctx.fill(CAT.nose);
+    ctx.lineWidth = lw * 0.8;
+    ctx.strokeStyle = INK;
+    ctx.stroke(CAT.mouth);
+    CAT.paws.forEach(([x, y]) => paw(x, y, '#FFFFFF', lw));
+    heart(CAT, k);
+    ctx.restore();
+
+    ctx.restore();
+  }
+
   function render() {
     frame = 0;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     if (bg) ctx.drawImage(bg, 0, 0, W, H);
+
+    // pets acordam quando o sofá fica limpo; o coração surge em 450ms
+    let k = 0;
+    if (finished) {
+      k = reduceMotion.matches ? 1 : Math.min(1, (performance.now() - wokeAt) / 450);
+      k = 1 - Math.pow(1 - k, 3);
+    }
     ctx.lineCap = 'round';
     for (let i = 0; i < hairs.length; i++) drawHair(hairs[i]);
+
+    drawPets(finished, k);
+    if (finished && k < 1) requestRender();
     drawRoller(roller || parkedPos());
   }
 
@@ -282,8 +437,9 @@
     if (hairs.length / total < 0.08) {
       hairs = [];
       finished = true;
+      wokeAt = performance.now();
       doneBadge.hidden = false;
-      status.textContent = 'Sofá limpo! Assim funciona o Rolo Tira Pelos.';
+      status.textContent = 'Sofá limpo! O cachorro e o gato acordaram. Assim funciona o Rolo Tira Pelos.';
       btnLabel.textContent = 'Espalhar pelos de novo';
       btnIcon.setAttribute('href', '#i-rotate-ccw');
     }
@@ -430,13 +586,14 @@
     render();
   }
 
+  resize();
   seedHairs();
+  render();
   if ('ResizeObserver' in window) {
     new ResizeObserver(resize).observe(stage);
   } else {
     window.addEventListener('resize', resize);
   }
-  resize();
 
   // demonstração única ao carregar: uma passada no meio da almofada
   if (!reduceMotion.matches) {
