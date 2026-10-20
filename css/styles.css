@@ -835,7 +835,33 @@ a { color: inherit; }
 }
 
 /* ---------- Depoimentos ---------- */
-.reviews { background: var(--mist); }
+.reviews {
+  position: relative;
+  overflow: hidden;
+  background: var(--mist);
+}
+.reviews .container { position: relative; z-index: 1; }
+
+/* ilustrações nas laterais: só onde há margem sobrando */
+.side-art {
+  position: absolute;
+  top: 55%;
+  /* encolhe junto com a margem lateral para nunca invadir o conteúdo */
+  width: clamp(90px, calc((100% - 1200px) / 2 + 30px), 140px);
+  height: auto;
+  aspect-ratio: 140 / 520;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: none;
+}
+.side-art-left  { left:  max(-24px, calc((100% - 1200px) / 2 - 120px)); }
+.side-art-right { right: max(-24px, calc((100% - 1200px) / 2 - 120px)); }
+@media (min-width: 1240px) { .side-art { display: block; } }
+
+.d-paw   { fill: #BFDFF2; }
+.d-bone  { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.d-ball  { fill: var(--sun); stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.d-heart { fill: #E2403F; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
 .review-list { display: grid; gap: 20px; }
 @media (min-width: 800px) { .review-list { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
 .review {

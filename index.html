@@ -27,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500..800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=5">
 
   <script>document.documentElement.classList.add('js')</script>
   <script type="application/ld+json">
@@ -67,6 +67,11 @@
       <symbol id="i-truck" viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></symbol>
       <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
       <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+      <!-- ilustrações decorativas, no traço da logo -->
+      <symbol id="d-paw" viewBox="-20 -18 40 44"><path d="M0 6C-10 6-15 14-13 20S-4 24 0 24 11 26 13 20 10 6 0 6Z"/><circle cx="-13" cy="-3" r="5"/><circle cx="-5" cy="-11" r="5.5"/><circle cx="5" cy="-11" r="5.5"/><circle cx="13" cy="-3" r="5"/></symbol>
+      <symbol id="d-bone" viewBox="-44 -16 88 32"><path d="M-24-6H24A7 7 0 1 1 33 0 7 7 0 1 1 24 6H-24A7 7 0 1 1-33 0 7 7 0 1 1-24-6Z"/></symbol>
+      <symbol id="d-ball" viewBox="-36 -36 72 72"><circle r="32"/><path d="M-29-12Q0 4 29-12M-27 13Q0-3 27 13" fill="none"/></symbol>
+      <symbol id="d-heart" viewBox="-16 -4 32 30"><path d="M0 6C0-3-13-3-13 7-13 14-4 19 0 24 4 19 13 14 13 7 13-3 0-3 0 6Z"/></symbol>
     </defs>
   </svg>
 
@@ -731,6 +736,22 @@
 
     <!-- ============ DEPOIMENTOS (PLACEHOLDERS) ============ -->
     <section class="section reviews" aria-labelledby="reviews-title">
+      <svg class="side-art side-art-left" viewBox="0 0 140 520" aria-hidden="true" focusable="false">
+        <use href="#d-bone" class="d-bone" x="12" y="60" width="116" height="42" transform="rotate(-24 70 81)"/>
+        <use href="#d-paw" class="d-paw" x="78" y="180" width="36" height="40" transform="rotate(14 96 200)"/>
+        <use href="#d-paw" class="d-paw" x="28" y="250" width="36" height="40" transform="rotate(-10 46 270)"/>
+        <use href="#d-paw" class="d-paw" x="82" y="320" width="36" height="40" transform="rotate(16 100 340)"/>
+        <use href="#d-paw" class="d-paw" x="32" y="390" width="36" height="40" transform="rotate(-8 50 410)"/>
+        <use href="#d-heart" class="d-heart" x="70" y="452" width="40" height="38" transform="rotate(12 90 471)"/>
+      </svg>
+      <svg class="side-art side-art-right" viewBox="0 0 140 520" aria-hidden="true" focusable="false">
+        <use href="#d-heart" class="d-heart" x="24" y="34" width="34" height="32" transform="rotate(-14 41 50)"/>
+        <use href="#d-ball" class="d-ball" x="40" y="96" width="84" height="84" transform="rotate(-18 82 138)"/>
+        <use href="#d-paw" class="d-paw" x="30" y="240" width="36" height="40" transform="rotate(-14 48 260)"/>
+        <use href="#d-paw" class="d-paw" x="80" y="310" width="36" height="40" transform="rotate(10 98 330)"/>
+        <use href="#d-paw" class="d-paw" x="34" y="380" width="36" height="40" transform="rotate(-12 52 400)"/>
+        <use href="#d-bone" class="d-bone" x="16" y="440" width="100" height="36" transform="rotate(20 66 458)"/>
+      </svg>
       <div class="container">
         <div class="section-head reveal">
           <h2 id="reviews-title">Quem comprou, conta</h2>
@@ -839,6 +860,6 @@
     </div>
   </footer>
 
-  <script src="js/main.js" defer></script>
+  <script src="js/main.js?v=5" defer></script>
 </body>
 </html>
