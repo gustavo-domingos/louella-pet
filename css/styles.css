@@ -704,7 +704,21 @@ a { color: inherit; }
   object-fit: cover;
   border-radius: var(--radius-sm);
 }
-.fc-body h3 { font-size: 1.5rem; font-stretch: 85%; }
+.fc-body > .fc-group {
+  margin-top: 0;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--sky-deep);
+}
+.fc-body h3 { margin-top: 2px; font-size: 1.5rem; font-stretch: 85%; }
+.price-suffix {
+  margin-left: 6px;
+  font-family: var(--font-body);
+  font-stretch: 100%;
+  font-size: .8125rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
 .fc-body > p { margin-top: 4px; font-size: .9375rem; color: var(--ink-soft); }
 .fc-buy {
   display: flex;

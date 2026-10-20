@@ -34,7 +34,7 @@
   const chips = document.querySelectorAll('.chip[data-filter]');
   const products = document.querySelectorAll('#product-grid .product');
   const filterStatus = document.getElementById('filter-status');
-  const labels = { all: 'todos os produtos', pet: 'produtos para o pet', casa: 'produtos para a casa' };
+  const labels = { all: 'todos os produtos', pet: 'produtos para o pet', higiene: 'produtos de higiene' };
 
   chips.forEach((chip) => {
     chip.addEventListener('click', () => {
@@ -55,7 +55,9 @@
         }
         if (show && !cats.includes('all')) count++;
       });
-      filterStatus.textContent = `Mostrando ${count} ${labels[filter]}.`;
+      filterStatus.textContent = filter === 'all'
+        ? `Mostrando todos os ${count} produtos.`
+        : `Mostrando ${count} ${labels[filter]}.`;
     });
   });
 
