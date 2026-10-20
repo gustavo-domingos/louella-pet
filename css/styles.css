@@ -835,30 +835,47 @@ a { color: inherit; }
 }
 
 /* ---------- Depoimentos ---------- */
-.reviews {
+.reviews { background: var(--mist); }
+
+/* ---------- Ilustrações nas laterais (só onde há margem sobrando) ---------- */
+.reviews,
+.has-side-art {
   position: relative;
   overflow: hidden;
-  background: var(--mist);
 }
-.reviews .container { position: relative; z-index: 1; }
+.reviews > .container,
+.has-side-art > .container { position: relative; z-index: 1; }
 
-/* ilustrações nas laterais: só onde há margem sobrando */
 .side-art {
+  /* --m: margem livre de cada lado, até onde o conteúdo começa */
+  --m: calc((100% - 1200px) / 2 + 40px);
+  /* encolhe junto com a margem para nunca invadir o conteúdo */
+  --w: clamp(90px, calc(var(--m) - 10px), 150px);
   position: absolute;
-  top: 55%;
-  /* encolhe junto com a margem lateral para nunca invadir o conteúdo */
-  width: clamp(90px, calc((100% - 1200px) / 2 + 30px), 140px);
+  top: var(--y, 55%);
+  width: var(--w);
   height: auto;
   aspect-ratio: 140 / 520;
   transform: translateY(-50%);
   pointer-events: none;
   display: none;
 }
-.side-art-left  { left:  max(-24px, calc((100% - 1200px) / 2 - 120px)); }
-.side-art-right { right: max(-24px, calc((100% - 1200px) / 2 - 120px)); }
+.has-side-art .side-art { aspect-ratio: 140 / 420; }
+/* centraliza na margem em telas largas; perto do conteúdo, mantém 20px de folga */
+.side-art-left {
+  left: max(-24px, min(calc(var(--m) - 20px - var(--w)), calc((var(--m) - var(--w)) / 2)));
+}
+.side-art-right {
+  right: max(-24px, min(calc(var(--m) - 20px - var(--w)), calc((var(--m) - var(--w)) / 2)));
+}
 @media (min-width: 1240px) { .side-art { display: block; } }
 
+.showcase .d-paw { fill: #D3E9F6; }
 .d-paw   { fill: #BFDFF2; }
+.d-yarn  { fill: #8CCBEE; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
+.d-fish  { fill: var(--sun); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
+.d-bubble { fill: var(--paper); fill-opacity: .7; stroke: var(--sky-deep); stroke-width: 2; stroke-linecap: round; }
+.d-drop  { fill: #8CCBEE; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; stroke-linecap: round; }
 .d-bone  { fill: var(--paper); stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; }
 .d-ball  { fill: var(--sun); stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; }
 .d-heart { fill: #E2403F; stroke: var(--ink); stroke-width: 2.2; stroke-linejoin: round; }
